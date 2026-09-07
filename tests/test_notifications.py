@@ -71,7 +71,7 @@ class NotificationTests(unittest.TestCase):
         self.post.assert_called_once_with(
             "https://api.onesignal.com/notifications",
             json={
-                "app_id": "test-app", "included_segments": ["Subscribed Users"],
+                "app_id": "test-app", "included_segments": ["Total Subscriptions"],
                 "target_channel": "push",
                 "headings": {"pt": "⚠️ Item esquecido!", "en": "⚠️ Item esquecido!"},
                 "contents": {"pt": "Você está saindo sem: Carteira.", "en": "Você está saindo sem: Carteira."},

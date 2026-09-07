@@ -21,7 +21,7 @@ def enviar_notificacao(titulo: str, mensagem: str) -> dict:
     # Montagem do Payload para Segmento Global
     payload = {
         "app_id": ONESIGNAL_APP_ID,
-        "included_segments": ["Subscribed Users"],
+        "included_segments": ["Total Subscriptions"],
         "target_channel": "push",
         "headings": {"pt": titulo, "en": titulo},
         "contents": {"pt": mensagem, "en": mensagem},
