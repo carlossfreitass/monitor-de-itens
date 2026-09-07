@@ -15,10 +15,12 @@ def processar():
     dados = request.get_json()
 
     # Validação de Segurança
-    if not dados or "uids_lidos" not in dados:
+    if not isinstance(dados, dict) or "uids_lidos" not in dados:
         return jsonify({"erro": "O campo 'uids_lidos' é obrigatório."}), 400
 
     uids_lidos = dados["uids_lidos"]
+    if not isinstance(uids_lidos, list):
+        return jsonify({"erro": "O campo 'uids_lidos' deve ser uma lista."}), 400
 
     # Consulta de Regras de Negócio no Banco de Dados
     itens_obrigatorios = Item.query.filter_by(obrigatorio=True).all()
@@ -44,12 +46,23 @@ def processar():
             corpo = f"Você está saindo sem: {lista_nomes}."
 
         # Disparo do Alerta para o OneSignal
-        enviar_notificacao(titulo, corpo)
+        notificacao = enviar_notificacao(titulo, corpo)
+
+        if not notificacao["sucesso"]:
+            return jsonify({
+                "status": "erro_notificacao",
+                "itens_faltando": itens_faltando,
+                "mensagem": corpo,
+                "notificacao_enviada": False,
+                "erro_notificacao": notificacao["erro"],
+            }), 502
 
         return jsonify({
             "status": "alerta",
             "itens_faltando": itens_faltando,
-            "mensagem": corpo
+            "mensagem": corpo,
+            "notificacao_enviada": True,
+            "onesignal_notification_id": notificacao["notification_id"],
         }), 200
 
     return jsonify({
