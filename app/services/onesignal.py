@@ -3,12 +3,14 @@ Serviço de Notificações Push via OneSignal.
 Gerencia o disparo de alertas globais para os usuários conectados ao aplicativo.
 """
 
+import logging
 import os
 from uuid import UUID
 import requests
 
 ONESIGNAL_APP_ID = os.getenv("ONESIGNAL_APP_ID")
 ONESIGNAL_API_KEY = os.getenv("ONESIGNAL_API_KEY")
+logger = logging.getLogger(__name__)
 
 # FUNÇÃO: Enviar Notificação Global
 def enviar_notificacao(titulo: str, mensagem: str) -> dict:
@@ -60,6 +62,12 @@ def enviar_notificacao(titulo: str, mensagem: str) -> dict:
         return {"sucesso": False, "erro": "resposta_inesperada"}
     notification_id = dados.get("id")
     if notification_id is None or notification_id == "":
+        logger.warning(
+            "OneSignal não criou notificação: status_code=%s errors=%r warnings=%r",
+            response.status_code,
+            dados.get("errors"),
+            dados.get("warnings"),
+        )
         return {"sucesso": False, "erro": "notificacao_nao_criada"}
     try:
         if not isinstance(notification_id, str) or UUID(notification_id).version != 4:
